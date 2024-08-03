@@ -16,10 +16,15 @@ module mkTbFoldedMultiplier();
     return tb;
 endmodule
 
+//exercise 1 begin
 (* synthesize *)
 module mkTbSignedVsUnsigned();
+    function Bit#(16) test_function( Bit#(8) a, Bit#(8) b ) = multiply_signed( a, b );
+    Empty tb <- mkTbMulFunction(test_function, multiply_signed, True);
+    return tb;
     // TODO: Implement test bench for Exercise 1
 endmodule
+//exercise 1 end
 
 (* synthesize *)
 module mkTbEx3();
