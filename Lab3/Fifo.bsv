@@ -32,17 +32,19 @@ module mkCFFifo( Fifo#(2, t) ) provisos (Bits#(t, tSz));
         return va[0];
     endmethod
 
-    method Action enq(t x);
+    //exercise 1 begin
+    method Action enq(t x) if(!vb[0]);//压入新数据（非满）
         db[0] <= x;
         vb[0] <= True;
     endmethod
 
-    method Action deq();
+    method Action deq() if(va[0]);//弹出旧数据（非空）
         va[0] <= False;
     endmethod
 
-    method t first;
+    method t first if(va[0]);//返回最旧数据（非空）
         return da[0];
     endmethod
+    //exercise 1 end
 endmodule
 

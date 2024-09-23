@@ -4,11 +4,11 @@ import Complex::*;
 typedef 8 DataSz;
 typedef Bit#(DataSz) Data;
 typedef Complex#(Data) ComplexData;
-typedef 64 FftPoints;
-typedef Bit#(TLog#(FftPoints)) FftIdx;
-typedef Bit#(TLog#(TLog#(FftPoints))) StageIdx;
-typedef TDiv#(TLog#(FftPoints), 2) NumStages;
-typedef TDiv#(FftPoints, 4) BflysPerStage;
+typedef 64 FftPoints;                              //输入点数
+typedef Bit#(TLog#(FftPoints)) FftIdx;             //输入总点数索引    的 数据类型
+typedef Bit#(TLog#(TLog#(FftPoints))) StageIdx;    //阶段数索引        的 数据类型
+typedef TDiv#(TLog#(FftPoints), 2) NumStages;      //阶段总数目（=3）
+typedef TDiv#(FftPoints, 4) BflysPerStage;         //每个阶段蝴蝶数目（=16）
 
 
 Integer fftPoints = valueOf(FftPoints);
@@ -20,6 +20,7 @@ endinterface
 
 (* synthesize *)
 module mkBfly4(Bfly4);
+    //四路蝶形运算（t为旋转因子，x为信号）
     method Vector#(4,ComplexData) bfly4(Vector#(4, ComplexData) t, Vector#(4, ComplexData) x);
         Vector#(4, ComplexData) m, y, z;
 
@@ -41,11 +42,13 @@ module mkBfly4(Bfly4);
     endmethod
 endmodule
 
+//计算旋转因子
 function ComplexData getTwiddle(StageIdx stage, FftIdx index);
     return cmplx(zeroExtend(index)/(2+zeroExtend(stage)/fromInteger(fftPoints)), 
             zeroExtend(index)/(1+zeroExtend(stage)/fromInteger(fftPoints)));
 endfunction
 
+//对蝶形运算的输出数据进行重新排序
 function Vector#(FftPoints,ComplexData) permute(Vector#(FftPoints,ComplexData) inVector);
     Vector#(FftPoints,ComplexData) outVector = newVector;
     for(Integer i = 0; i < valueof(FftPoints)/2; i=i+1) begin
